@@ -114,9 +114,9 @@ class MLPPolicyPG(MLPPolicy):
 
         # Done: implement the policy gradient actor update.
 
-        predicted_actions = self.forward(obs)
+        action_distribution = self.forward(obs)
 
-        log_probs = predicted_actions.log_prob(actions)
+        log_probs = action_distribution.log_prob(actions)
         if not self.discrete:
             log_probs = log_probs.sum(dim=-1)
 

@@ -100,6 +100,8 @@ class MemoryEfficientReplayBuffer:
 
         self.observation_framebuffer_idcs = None
         self.next_observation_framebuffer_idcs = None
+
+        # framebuffer stores both observations and next_observations
         self.framebuffer = None
         self.observation_shape = None
 

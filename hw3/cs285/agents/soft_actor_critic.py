@@ -188,11 +188,11 @@ class SoftActorCritic(nn.Module):
         with torch.no_grad():
             # TODO(student)
             # Sample from the actor
-            next_action_distribution: torch.distributions.Distribution = ...
-            next_action = ...
+            next_action_distribution: torch.distributions.Distribution = self.actor(obs)
+            next_action = next_action_distribution.sample()
 
             # Compute the next Q-values for the sampled actions
-            next_qs = ...
+            next_qs = self.critic(next_obs, next_action)
 
             # Handle Q-values from multiple different target critic networks (if necessary)
             # (For double-Q, clip-Q, etc.)
@@ -209,7 +209,7 @@ class SoftActorCritic(nn.Module):
                 next_qs += ...
 
             # Compute the target Q-value
-            target_values: torch.Tensor = ...
+            target_values: torch.Tensor = reward + self.discount*next_qs
             assert target_values.shape == (
                 self.num_critic_networks,
                 batch_size
@@ -217,11 +217,11 @@ class SoftActorCritic(nn.Module):
 
         # TODO(student): Update the critic
         # Predict Q-values
-        q_values = ...
+        q_values = self.critic(obs, action)
         assert q_values.shape == (self.num_critic_networks, batch_size), q_values.shape
 
         # Compute loss
-        loss: torch.Tensor = ...
+        loss: torch.Tensor = self.critic_loss(q_values, target_values)
 
         self.critic_optimizer.zero_grad()
         loss.backward()
@@ -343,7 +343,7 @@ class SoftActorCritic(nn.Module):
         # TODO(student): Update the critic for num_critic_upates steps, and add the output stats to critic_infos
 
         # TODO(student): Update the actor
-        actor_info = ...
+        actor_info = self.update_actor(observations)
 
         # TODO(student): Perform either hard or soft target updates.
         # Relevant variables:

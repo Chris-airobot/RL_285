@@ -1,7 +1,7 @@
 from typing import Optional, Sequence
 import numpy as np
 import torch
-
+import copy
 from cs285.networks.policies import MLPPolicyPG
 from cs285.networks.critics import ValueCritic
 from cs285.infrastructure import pytorch_util as ptu
@@ -147,7 +147,13 @@ class PGAgent(nn.Module):
                     # TODO: recursively compute advantage estimates starting from timestep T.
                     # HINT: use terminals to handle edge cases. terminals[i] is 1 if the state is the last in its
                     # trajectory, and 0 otherwise.
-                    pass
+
+                    if terminals[i]:
+                        delta = rewards[i] - values[i]
+                        advantages[i] = delta
+                    else:
+                        delta = rewards[i] + self.gamma*values[i+1] - values[i]
+                        advantages[i] = delta + self.gamma * self.gae_lambda * advantages[i+1]
 
                 # remove dummy advantage
                 advantages = advantages[:-1]
